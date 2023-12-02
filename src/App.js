@@ -171,6 +171,7 @@ export default function App() {
           <Route element={<PrivateRouteWrapper />}>{getRoutes(routes)}</Route>
           {getRoutes(authRout)}
           <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
+          <Route path="/" element={<Navigate to="/authentication/sign-in" />} />
         </Routes>
       </ThemeProvider>
     </CacheProvider>
@@ -195,6 +196,7 @@ export default function App() {
       <Routes>
         <Route element={<PrivateRouteWrapper />}>{getRoutes(routes)}</Route>
         {getRoutes(authRout)}
+        <Route path="/" element={<Navigate to="/authentication/sign-in" />} />
         <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
       </Routes>
     </ThemeProvider>

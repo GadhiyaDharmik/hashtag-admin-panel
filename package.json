@@ -1,5 +1,5 @@
 {
-  "homepage": "",
+  "homepage": "http://GadhiyaDharmik.github.io/hashtag-admin-panel",
   "name": "material-dashboard-2-react",
   "version": "2.2.0",
   "private": true,
@@ -38,8 +38,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "predeploy":"npm run build",
-    "deploy":"gh-pages -d build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
