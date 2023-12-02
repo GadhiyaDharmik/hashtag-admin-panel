@@ -47,6 +47,7 @@ import SignUp from "layouts/authentication/sign-up";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
+import Blog from "layouts/tables";
 
 const routes = [
   {
@@ -59,12 +60,20 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Tables",
-    key: "tables",
+    name: "Blog",
+    key: "blogs",
     icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: <Tables />,
+    route: "/blog",
+    component: <Blog />,
   },
+  // {
+  //   type: "collapse",
+  //   name: "Tables",
+  //   key: "tables",
+  //   icon: <Icon fontSize="small">table_view</Icon>,
+  //   route: "/tables",
+  //   component: <Tables />,
+  // },
   {
     type: "collapse",
     name: "Billing",
@@ -73,14 +82,14 @@ const routes = [
     route: "/billing",
     component: <Billing />,
   },
-  {
-    type: "collapse",
-    name: "RTL",
-    key: "rtl",
-    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-    route: "/rtl",
-    component: <RTL />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "RTL",
+  //   key: "rtl",
+  //   icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
+  //   route: "/rtl",
+  //   component: <RTL />,
+  // },
   {
     type: "collapse",
     name: "Notifications",
@@ -97,6 +106,9 @@ const routes = [
     route: "/profile",
     component: <Profile />,
   },
+];
+
+const authRout = [
   {
     type: "collapse",
     name: "Sign In",
@@ -115,4 +127,4 @@ const routes = [
   },
 ];
 
-export default routes;
+export { routes, authRout };
