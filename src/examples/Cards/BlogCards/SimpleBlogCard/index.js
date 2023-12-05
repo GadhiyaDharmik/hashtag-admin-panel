@@ -27,8 +27,12 @@ import MuiLink from "@mui/material/Link";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
+import { Icon } from "@mui/material";
+import { useMaterialUIController } from "context";
 
-function SimpleBlogCard({ image, title, description, action }) {
+function SimpleBlogCard({ image, title, description, action, handleClickDelete, handleClickEdit }) {
+  const [controller] = useMaterialUIController();
+  const { darkMode } = controller;
   return (
     <Card>
       <MDBox position="relative" borderRadius="lg" mt={3} mx={2}>
@@ -69,9 +73,20 @@ function SimpleBlogCard({ image, title, description, action }) {
           </MDTypography>
         </MDBox>
         {action.type === "external" ? (
-          <MuiLink href={action.route} target="_blank" rel="noreferrer">
-            <MDButton color={action.color ? action.color : "dark"}>{action.label}</MDButton>
-          </MuiLink>
+          <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
+            <MDBox mr={1}>
+              <MDButton
+                variant="text"
+                color={darkMode ? "white" : "dark"}
+                onClick={handleClickEdit}
+              >
+                <Icon>edit</Icon>&nbsp;edit
+              </MDButton>
+            </MDBox>
+            <MDButton variant="text" color="error" onClick={handleClickDelete}>
+              <Icon>delete</Icon>&nbsp;delete
+            </MDButton>
+          </MDBox>
         ) : (
           <Link to={action.route}>
             <MDButton color={action.color ? action.color : "dark"}>{action.label}</MDButton>

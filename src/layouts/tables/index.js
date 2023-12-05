@@ -33,18 +33,22 @@ import projectsTableData from "layouts/tables/data/projectsTableData";
 import MDButton from "components/MDButton";
 import { Switch } from "@mui/material";
 import MDInput from "components/MDInput";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import SimpleBlogCard from "examples/Cards/BlogCards/SimpleBlogCard";
+import MDSnackbar from "components/MDSnackbar";
 
 function Blog() {
   const { columns, rows } = authorsTableData();
   const { columns: pColumns, rows: pRows } = projectsTableData();
-  const [fileData, setFileData] = useState(null);
-  const [title, setTitle] = useState(null);
-  const [discription, setDiscription] = useState(null);
+  const [fileData, setFileData] = useState("");
+  const [title, setTitle] = useState("");
+  const [discription, setDiscription] = useState("");
   const [blogList, setBlogList] = useState([]);
   const [lodder, setLodder] = useState(false);
+  const [successSB, setSuccessSB] = useState(false);
+  const [showMassage, setShowMassage] = useState("");
+  const fileClick = useRef();
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -56,33 +60,45 @@ function Blog() {
       reader.readAsDataURL(file);
     }
   };
-
   useEffect(() => {
     setLodder(true);
-    axios.get("https://hashteg-bbfc1-default-rtdb.firebaseio.com/blogs.json").then((res) => {
-      const data = Object.values(res.data);
-      if (data.length > 0) {
-        setBlogList(data);
-        setLodder(false);
-      } else {
-        setBlogList([]);
-      }
-    });
+    axios
+      .get("https://hastag-admin-default-rtdb.firebaseio.com/blogs.json", {
+        Authorization: "Bearer J3_0kzz6HPJ1AyB4X4rG9QoZK2h3YnnpYjEgetbibb8", // Replace YOUR_TOKEN with your actual authorization token
+        "Content-Type": "application/json", // Adjust content type if necessary
+      })
+      .then((res) => {
+        if (res.data !== null) {
+          let data = Object.values(res.data);
+          let ids = Object.keys(res.data);
+          const allData = data.map((ele, index) => {
+            return { id: ids[index], ...ele };
+          });
+          setBlogList(allData);
+          // console.log(allData);
+          setLodder(false);
+        } else {
+          setBlogList([]);
+        }
+      });
   }, []);
 
   const handleSubmit = () => {
     console.log(fileData);
     const data = { file: fileData, title: title, discription: discription };
-    if (fileData !== null && title !== null && discription !== null) {
+    if (fileData !== "" && title !== "" && discription !== "") {
       axios
-        .post("https://hashteg-bbfc1-default-rtdb.firebaseio.com/blogs.json", data)
+        .post("https://hastag-admin-default-rtdb.firebaseio.com/blogs.json", data)
         .then((res) => {
           if (res.status === 200) {
-            setFileData(null);
-            document.getElementsById("file-upload").value = "";
-            setTitle(null);
-            setDiscription(null);
-            alert("Blog Created Success Fully");
+            setFileData("");
+            document.getElementById("file-upload").value = "";
+            setTitle("");
+            setDiscription("");
+            // alert("Blog Created Success Fully");
+            setSuccessSB(true);
+
+            setShowMassage("Blog Created Success Fully");
             setBlogList([...blogList, data]);
           }
         });
@@ -92,9 +108,45 @@ function Blog() {
 
     // console.log(pColumns);
   };
+  const handleClickEdit = (ele) => {
+    console.log(ele);
+    setTitle(ele.title);
+    setFileData(ele.file);
+    setDiscription(ele.discription);
+  };
+  const handleClickDelete = (ele) => {
+    // setBlogList([...blogList].filter((item) => item.id !== ele.id));
+    let dataList = [...blogList];
+    // dataList.filter((item) => item.id !== ele.id);
+    // cosnole.log
+    axios
+      .delete(`https://hastag-admin-default-rtdb.firebaseio.com/blogs/${ele.id}.json`)
+      .then((res) => {
+        if (res.status === 200) {
+          setBlogList([...blogList].filter((item) => item.id !== ele.id));
+          setSuccessSB(true);
+          setShowMassage("Blog deleted successfully");
+        }
+      });
+  };
+
+  const handleFileClick = () => {
+    fileClick.current.click();
+  };
   return (
     <DashboardLayout>
       <DashboardNavbar />
+      <MDSnackbar
+        color="success"
+        icon="check"
+        title="HashTag Solution"
+        content={showMassage}
+        // dateTime="11 mins ago"
+        open={successSB}
+        onClose={() => setSuccessSB(false)}
+        close={() => setSuccessSB(false)}
+        bgWhite
+      />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
@@ -123,33 +175,91 @@ function Blog() {
                 /> */}
                 <MDBox pt={4} pb={3} px={3}>
                   <MDBox component="form" role="form">
-                    <MDBox mb={2}>
-                      <MDInput
-                        type="file"
-                        id="file-upload"
-                        label=""
-                        fullWidth
-                        onChange={handleFileChange}
-                      />
-                    </MDBox>
-                    <MDBox mb={2}>
-                      <MDInput
-                        type="title"
-                        label="Title"
-                        value={title}
-                        fullWidth
-                        onChange={(e) => setTitle(e.target.value)}
-                      />
-                    </MDBox>
-                    <MDBox mb={2}>
-                      <MDInput
-                        type="discription"
-                        label="Discription"
-                        value={discription}
-                        fullWidth
-                        onChange={(e) => setDiscription(e.target.value)}
-                      />
-                    </MDBox>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} md={12} xl={6}>
+                        {fileData !== "" ? (
+                          <div
+                            style={{
+                              width: "100%",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <img
+                              src={fileData}
+                              style={{
+                                width: "100%",
+                                border: "2px dotted #777",
+                                borderRadius: "20%",
+                              }}
+                              onClick={handleFileClick}
+                            />
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              width: "100%",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <img
+                              src={
+                                "https://media.istockphoto.com/id/1324356458/vector/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=ZmXO4mSgNDPzDRX-F8OKCfmMqqHpqMV6jiNi00Ye7rE="
+                              }
+                              style={{
+                                width: "100%",
+                                border: "2px dotted #777",
+                                borderRadius: "20%",
+                              }}
+                              onClick={handleFileClick}
+                            />
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          id="file-upload"
+                          ref={fileClick}
+                          label=""
+                          onClick={handleFileChange}
+                          style={{ display: "none" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={12} xl={6}>
+                        <Grid container spacing={3} mt={5}>
+                          <Grid item xs={12} md={12} xl={12}>
+                            <MDInput
+                              type="text"
+                              label="Title"
+                              value={title}
+                              fullWidth
+                              onChange={(e) => setTitle(e.target.value)}
+                            />
+                          </Grid>
+                          <Grid item xs={12} md={12} xl={12}>
+                            <MDInput
+                              multiline
+                              label="Discription"
+                              value={discription}
+                              fullWidth
+                              onChange={(e) => setDiscription(e.target.value)}
+                            />
+                          </Grid>
+                          <Grid item xs={12} md={12} xl={12}>
+                            <MDButton
+                              variant="gradient"
+                              color="info"
+                              fullWidth
+                              onClick={handleSubmit}
+                            >
+                              Create Blog
+                            </MDButton>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+
+                    {/* <MDBox mb={2}></MDBox>
+                    <MDBox mb={2}></MDBox>
+                    <MDBox mb={2}></MDBox> */}
                     {/* <MDBox display="flex" alignItems="center" ml={-1}>
                       <Switch checked={rememberMe} onChange={handleSetRememberMe} />
                       <MDTypography
@@ -162,11 +272,9 @@ function Blog() {
                         &nbsp;&nbsp;Remember me
                       </MDTypography>
                     </MDBox> */}
-                    <MDBox mt={4} mb={1}>
-                      <MDButton variant="gradient" color="info" fullWidth onClick={handleSubmit}>
-                        Create Blog
-                      </MDButton>
-                    </MDBox>
+                    {/* <MDBox mt={4} mb={1}>
+                    
+                    </MDBox> */}
                     {/* <MDBox mt={3} mb={1} textAlign="center">
               <MDTypography variant="button" color="text">
                 Don&apos;t have an account?{" "}
@@ -212,23 +320,30 @@ function Blog() {
                   noEndBorder
                 /> */}
 
-                <Grid container spacing={3}>
-                  {blogList.map((ele, index) => (
-                    <Grid item xs={12} md={6} xl={4} p={5} key={index}>
-                      <SimpleBlogCard
-                        image={ele.file}
-                        title={ele.title}
-                        description={ele.discription}
-                        action={{
-                          type: "internal",
-                          route: "/somewhere",
-                          color: "info",
-                          label: "Go Somewhere",
-                        }}
-                      />
+                {blogList.length > 0 ? (
+                  <Grid container spacing={3}>
+                    {blogList.map((ele, index) => (
+                      <Grid item xs={12} md={6} xl={4} p={5} key={index}>
+                        <SimpleBlogCard
+                          image={ele.file}
+                          title={ele.title}
+                          description={ele.discription}
+                          handleClickDelete={() => handleClickDelete(ele)}
+                          handleClickEdit={() => handleClickEdit(ele)}
+                          action={{
+                            type: "external",
+                          }}
+                        />
+                      </Grid>
+                    ))}
+                  </Grid>
+                ) : (
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={12} xl={12} p={5} style={{ textAlign: "center" }}>
+                      No Data
                     </Grid>
-                  ))}
-                </Grid>
+                  </Grid>
+                )}
               </MDBox>
             </Card>
           </Grid>
