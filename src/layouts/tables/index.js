@@ -48,6 +48,7 @@ function Blog() {
   const [lodder, setLodder] = useState(false);
   const [successSB, setSuccessSB] = useState(false);
   const [showMassage, setShowMassage] = useState("");
+  const [isEdit, setIsEdit] = useState("");
   const fileClick = useRef();
 
   const handleFileChange = (event) => {
@@ -60,8 +61,8 @@ function Blog() {
       reader.readAsDataURL(file);
     }
   };
-  useEffect(() => {
-    setLodder(true);
+
+  function getData() {
     axios
       .get("https://hastag-admin-default-rtdb.firebaseio.com/blogs.json", {
         Authorization: "Bearer J3_0kzz6HPJ1AyB4X4rG9QoZK2h3YnnpYjEgetbibb8", // Replace YOUR_TOKEN with your actual authorization token
@@ -81,27 +82,50 @@ function Blog() {
           setBlogList([]);
         }
       });
+  }
+  useEffect(() => {
+    setLodder(true);
+    getData();
   }, []);
 
   const handleSubmit = () => {
     console.log(fileData);
     const data = { file: fileData, title: title, discription: discription };
     if (fileData !== "" && title !== "" && discription !== "") {
-      axios
-        .post("https://hastag-admin-default-rtdb.firebaseio.com/blogs.json", data)
-        .then((res) => {
-          if (res.status === 200) {
-            setFileData("");
-            document.getElementById("file-upload").value = "";
-            setTitle("");
-            setDiscription("");
-            // alert("Blog Created Success Fully");
-            setSuccessSB(true);
+      if (isEdit !== "") {
+        let id = blogList.filter((ele) => ele.id === isEdit);
 
-            setShowMassage("Blog Created Success Fully");
-            setBlogList([...blogList, data]);
-          }
-        });
+        axios
+          .put(`https://hastag-admin-default-rtdb.firebaseio.com/blogs/${id?.at(0).id}.json`, data)
+          .then((res) => {
+            if (res.status === 200) {
+              setFileData("");
+              document.getElementById("file-upload").value = "";
+              setTitle("");
+              setDiscription("");
+              // alert("Blog Created Success Fully");
+              setSuccessSB(true);
+              setShowMassage("Blog Updated Successfully");
+              setIsEdit("");
+              // setBlogList([...blogList, data]);
+              getData();
+            }
+          });
+      } else {
+        axios
+          .post("https://hastag-admin-default-rtdb.firebaseio.com/blogs.json", data)
+          .then((res) => {
+            if (res.status === 200) {
+              setFileData("");
+              document.getElementById("file-upload").value = "";
+              setTitle("");
+              setDiscription("");
+              // alert("Blog Created Success Fully");
+              setSuccessSB(true);
+              setShowMassage("Blog Created Successfully");
+            }
+          });
+      }
     } else {
       alert("please fill all detail");
     }
@@ -113,6 +137,7 @@ function Blog() {
     setTitle(ele.title);
     setFileData(ele.file);
     setDiscription(ele.discription);
+    setIsEdit(ele.id);
   };
   const handleClickDelete = (ele) => {
     // setBlogList([...blogList].filter((item) => item.id !== ele.id));
@@ -125,7 +150,7 @@ function Blog() {
         if (res.status === 200) {
           setBlogList([...blogList].filter((item) => item.id !== ele.id));
           setSuccessSB(true);
-          setShowMassage("Blog deleted successfully");
+          setShowMassage("Blog Deleted Successfully");
         }
       });
   };
@@ -250,7 +275,7 @@ function Blog() {
                               fullWidth
                               onClick={handleSubmit}
                             >
-                              Create Blog
+                              {isEdit !== "" ? "Update Blog" : "Create Blog"}
                             </MDButton>
                           </Grid>
                         </Grid>
