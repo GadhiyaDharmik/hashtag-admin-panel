@@ -37,6 +37,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import SimpleBlogCard from "examples/Cards/BlogCards/SimpleBlogCard";
 import MDSnackbar from "components/MDSnackbar";
+import "../../assets/lodar.css";
 
 function Blog() {
   const { columns, rows } = authorsTableData();
@@ -45,7 +46,7 @@ function Blog() {
   const [title, setTitle] = useState("");
   const [discription, setDiscription] = useState("");
   const [blogList, setBlogList] = useState([]);
-  const [lodder, setLodder] = useState(false);
+  const [lodder, setLodder] = useState("");
   const [successSB, setSuccessSB] = useState(false);
   const [showMassage, setShowMassage] = useState("");
   const [isEdit, setIsEdit] = useState("");
@@ -77,14 +78,14 @@ function Blog() {
           });
           setBlogList(allData);
           // console.log(allData);
-          setLodder(false);
+          setLodder("");
         } else {
           setBlogList([]);
         }
       });
   }
   useEffect(() => {
-    setLodder(true);
+    setLodder("table");
     getData();
   }, []);
 
@@ -92,6 +93,11 @@ function Blog() {
     console.log(fileData);
     const data = { file: fileData, title: title, discription: discription };
     if (fileData !== "" && title !== "" && discription !== "") {
+      setFileData("");
+      document.getElementById("file-upload").value = "";
+      setTitle("");
+      setDiscription("");
+      setLodder("form");
       if (isEdit !== "") {
         let id = blogList.filter((ele) => ele.id === isEdit);
 
@@ -99,14 +105,11 @@ function Blog() {
           .put(`https://hastag-admin-default-rtdb.firebaseio.com/blogs/${id?.at(0).id}.json`, data)
           .then((res) => {
             if (res.status === 200) {
-              setFileData("");
-              document.getElementById("file-upload").value = "";
-              setTitle("");
-              setDiscription("");
               // alert("Blog Created Success Fully");
               setSuccessSB(true);
               setShowMassage("Blog Updated Successfully");
               setIsEdit("");
+              setLodder("");
               // setBlogList([...blogList, data]);
               getData();
             }
@@ -116,13 +119,12 @@ function Blog() {
           .post("https://hastag-admin-default-rtdb.firebaseio.com/blogs.json", data)
           .then((res) => {
             if (res.status === 200) {
-              setFileData("");
-              document.getElementById("file-upload").value = "";
-              setTitle("");
-              setDiscription("");
               // alert("Blog Created Success Fully");
               setSuccessSB(true);
+              setLodder("");
+
               setShowMassage("Blog Created Successfully");
+              getData();
             }
           });
       }
@@ -244,7 +246,7 @@ function Blog() {
                           id="file-upload"
                           ref={fileClick}
                           label=""
-                          onClick={handleFileChange}
+                          onChange={handleFileChange}
                           style={{ display: "none" }}
                         />
                       </Grid>
@@ -275,7 +277,13 @@ function Blog() {
                               fullWidth
                               onClick={handleSubmit}
                             >
-                              {isEdit !== "" ? "Update Blog" : "Create Blog"}
+                              {lodder === "form" ? (
+                                <div className="loader"></div>
+                              ) : isEdit !== "" ? (
+                                "Update Blog"
+                              ) : (
+                                "Create Blog"
+                              )}
                             </MDButton>
                           </Grid>
                         </Grid>
@@ -365,7 +373,7 @@ function Blog() {
                 ) : (
                   <Grid container spacing={3}>
                     <Grid item xs={12} md={12} xl={12} p={5} style={{ textAlign: "center" }}>
-                      No Data
+                      {lodder === "table" ? <div className="loader"></div> : "No Data"}
                     </Grid>
                   </Grid>
                 )}
