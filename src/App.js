@@ -71,6 +71,9 @@ export default function App() {
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
 
+  // window.onbeforeunload = function () {
+  //   window.location.href = "https://your-redirect-url.com"; // Replace with your desired URL
+  // };
   // Cache for the rtl
   useMemo(() => {
     const cacheRtl = createCache({

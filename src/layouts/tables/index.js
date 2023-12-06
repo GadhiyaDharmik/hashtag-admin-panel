@@ -106,12 +106,12 @@ function Blog() {
           .then((res) => {
             if (res.status === 200) {
               // alert("Blog Created Success Fully");
+              getData();
               setSuccessSB(true);
               setShowMassage("Blog Updated Successfully");
               setIsEdit("");
               setLodder("");
               // setBlogList([...blogList, data]);
-              getData();
             }
           });
       } else {
