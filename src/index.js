@@ -26,10 +26,8 @@ const root = createRoot(container);
 
 root.render(
   <HashRouter>
-    <BrowserRouter>
-      <MaterialUIControllerProvider>
-        <App />
-      </MaterialUIControllerProvider>
-    </BrowserRouter>
+    <MaterialUIControllerProvider>
+      <App />
+    </MaterialUIControllerProvider>
   </HashRouter>
 );
