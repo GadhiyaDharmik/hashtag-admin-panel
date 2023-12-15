@@ -10,10 +10,12 @@
 
 Coded by www.creative-tim.com
 
- =========================================================
+=========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 // @mui material components
 import Tooltip from "@mui/material/Tooltip";
@@ -35,6 +37,19 @@ import team3 from "assets/images/team-3.jpg";
 import team4 from "assets/images/team-4.jpg";
 
 export default function data() {
+  const [allContactsData, setAllContactsData] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("https://hastag-admin-default-rtdb.firebaseio.com/contacts.json")
+      .then((response) => {
+        const contacts = Object.values(response.data); // Assuming the API returns an array of blog objects
+        setAllContactsData(contacts);
+      })
+      .catch((error) => {
+        console.error("Error fetching blog data:", error);
+      });
+  }, []);
   const avatars = (members) =>
     members.map(([image, name]) => (
       <Tooltip key={name} title={name} placeholder="bottom">
@@ -71,140 +86,43 @@ export default function data() {
 
   return {
     columns: [
-      { Header: "companies", accessor: "companies", width: "45%", align: "left" },
-      { Header: "members", accessor: "members", width: "10%", align: "left" },
-      { Header: "budget", accessor: "budget", align: "center" },
-      { Header: "completion", accessor: "completion", align: "center" },
+      { Header: "Name", accessor: "name", width: "10%", align: "left" },
+      { Header: "Email", accessor: "email", width: "35%", align: "left" },
+      { Header: "Mobile Number", accessor: "mobileNumber", align: "center" },
+      { Header: "Subject", accessor: "subject", align: "center" },
+      { Header: "Comments", accessor: "comments", align: "center" },
     ],
 
-    rows: [
-      {
-        companies: <Company image={logoXD} name="Material UI XD Version" />,
-        members: (
-          <MDBox display="flex" py={1}>
-            {avatars([
-              [team1, "Ryan Tompson"],
-              [team2, "Romina Hadid"],
-              [team3, "Alexander Smith"],
-              [team4, "Jessica Doe"],
-            ])}
-          </MDBox>
-        ),
-        budget: (
+    rows: allContactsData?.map((ele) => {
+      let Rows = {
+        name: (
           <MDTypography variant="caption" color="text" fontWeight="medium">
-            $14,000
+            {ele.name}
           </MDTypography>
         ),
-        completion: (
-          <MDBox width="8rem" textAlign="left">
-            <MDProgress value={60} color="info" variant="gradient" label={false} />
-          </MDBox>
-        ),
-      },
-      {
-        companies: <Company image={logoAtlassian} name="Add Progress Track" />,
-        members: (
-          <MDBox display="flex" py={1}>
-            {avatars([
-              [team2, "Romina Hadid"],
-              [team4, "Jessica Doe"],
-            ])}
-          </MDBox>
-        ),
-        budget: (
+        email: (
           <MDTypography variant="caption" color="text" fontWeight="medium">
-            $3,000
+            {ele.email}
           </MDTypography>
         ),
-        completion: (
-          <MDBox width="8rem" textAlign="left">
-            <MDProgress value={10} color="info" variant="gradient" label={false} />
-          </MDBox>
-        ),
-      },
-      {
-        companies: <Company image={logoSlack} name="Fix Platform Errors" />,
-        members: (
-          <MDBox display="flex" py={1}>
-            {avatars([
-              [team1, "Ryan Tompson"],
-              [team3, "Alexander Smith"],
-            ])}
-          </MDBox>
-        ),
-        budget: (
+        mobileNumber: (
           <MDTypography variant="caption" color="text" fontWeight="medium">
-            Not set
+            {ele.mobileNumber}
           </MDTypography>
         ),
-        completion: (
-          <MDBox width="8rem" textAlign="left">
-            <MDProgress value={100} color="success" variant="gradient" label={false} />
-          </MDBox>
-        ),
-      },
-      {
-        companies: <Company image={logoSpotify} name="Launch our Mobile App" />,
-        members: (
-          <MDBox display="flex" py={1}>
-            {avatars([
-              [team4, "Jessica Doe"],
-              [team3, "Alexander Smith"],
-              [team2, "Romina Hadid"],
-              [team1, "Ryan Tompson"],
-            ])}
-          </MDBox>
-        ),
-        budget: (
+        subject: (
           <MDTypography variant="caption" color="text" fontWeight="medium">
-            $20,500
+            {ele.subject}
           </MDTypography>
         ),
-        completion: (
-          <MDBox width="8rem" textAlign="left">
-            <MDProgress value={100} color="success" variant="gradient" label={false} />
-          </MDBox>
-        ),
-      },
-      {
-        companies: <Company image={logoJira} name="Add the New Pricing Page" />,
-        members: (
-          <MDBox display="flex" py={1}>
-            {avatars([[team4, "Jessica Doe"]])}
-          </MDBox>
-        ),
-        budget: (
+        comments: (
           <MDTypography variant="caption" color="text" fontWeight="medium">
-            $500
+            {ele.comments}
           </MDTypography>
         ),
-        completion: (
-          <MDBox width="8rem" textAlign="left">
-            <MDProgress value={25} color="info" variant="gradient" label={false} />
-          </MDBox>
-        ),
-      },
-      {
-        companies: <Company image={logoInvesion} name="Redesign New Online Shop" />,
-        members: (
-          <MDBox display="flex" py={1}>
-            {avatars([
-              [team1, "Ryan Tompson"],
-              [team4, "Jessica Doe"],
-            ])}
-          </MDBox>
-        ),
-        budget: (
-          <MDTypography variant="caption" color="text" fontWeight="medium">
-            $2,000
-          </MDTypography>
-        ),
-        completion: (
-          <MDBox width="8rem" textAlign="left">
-            <MDProgress value={40} color="info" variant="gradient" label={false} />
-          </MDBox>
-        ),
-      },
-    ],
+      };
+
+      return Rows;
+    }),
   };
 }

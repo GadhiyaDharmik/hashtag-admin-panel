@@ -35,7 +35,7 @@ import { Switch } from "@mui/material";
 import MDInput from "components/MDInput";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import SimpleBlogCard from "examples/Cards/BlogCards/SimpleBlogCard";
+import SimpleBlogCard from "../../examples/Cards/BlogCards/SimpleBlogCard";
 import MDSnackbar from "components/MDSnackbar";
 import "../../assets/lodar.css";
 
@@ -141,7 +141,7 @@ function Blog() {
     setDiscription(ele.discription);
     setIsEdit(ele.id);
   };
-  const handleClickDelete = (ele) => {
+  const handleClickDeletes = (ele) => {
     // setBlogList([...blogList].filter((item) => item.id !== ele.id));
     let dataList = [...blogList];
     // dataList.filter((item) => item.id !== ele.id);
@@ -361,7 +361,7 @@ function Blog() {
                           image={ele.file}
                           title={ele.title}
                           description={ele.discription}
-                          handleClickDelete={() => handleClickDelete(ele)}
+                          handleClickDelete={() => handleClickDeletes(ele)} 
                           handleClickEdit={() => handleClickEdit(ele)}
                           action={{
                             type: "external",
